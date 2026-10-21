@@ -1,5 +1,36 @@
 # Water Atlas static explorer
 
+## Discovery and retrieval release
+
+The saved Water Atlas DataMapper catalog contains 53 Manatee Atlas entries.
+The county selector uses Atlas membership, which is not a verified geographic
+county assignment. Historical sample stations are not comprehensively covered
+by this real-time-oriented catalog. Missing waterbody associations are explicitly
+grouped as unassigned. UM2 retains its verified Lake Manatee association.
+
+Refresh station catalog requests the public Water Atlas API; if unavailable or
+blocked by browser CORS rules, the saved snapshot stays available. Run
+`python refresh_discovery.py` to refresh the embedded snapshot before rebuilding.
+
+Discovered USGS_NWIS stations support on-demand daily-value retrieval directly
+from USGS for 1, 5 or 10 years. These are daily statistical measurements, not
+discrete Water Atlas laboratory samples. Parameter code, unit, statistic and
+original provider qualifiers are preserved. Only A-approved values are charted
+by default. The optional provisional setting allows P values; other flagged
+values stay excluded. Downloads retain their original flags. Provider no-data
+sentinels are omitted. The response station ID is checked. Requests time out,
+and switching selections prevents stale responses from changing the new view.
+
+Other providers are discoverable but automated measurement retrieval is not yet
+supported. The Atlas latest-measurement service timed out during verification;
+its documented datadownload/list POST endpoint returned a deprecation message.
+This release does not claim all county stations or all provider histories.
+
+Direct retrieval uses public CORS-enabled USGS Water Services, with no API key.
+If USGS retires this service, the adapter will need migration. Data stays in the
+current browser tab and is lost on reload unless downloaded. Tested against 365
+daily flow records from USGS station 02298530 (Coker Creek).
+
 Open index.html directly in a modern browser, or serve this folder with any static host. No API key, Python server, account, or network request is needed to explore the data. The verified station extract and chart code are embedded.
 
 Choose county, waterbody, source/station, parameter, unit and depth. Chart controls include dates, decimal places, and scale. Changing the outer selection resets chart filters. Only waterbodies with loaded records appear. The Manatee County pilot includes WIN_21FLMANA|UM2 only. No automatic refresh or full Atlas catalog is claimed.
