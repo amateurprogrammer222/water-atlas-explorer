@@ -137,3 +137,5 @@ are not reconstructed. Selected graph records, all loaded waterbody parameters,
 and a station manifest can be downloaded separately. Loading another parameter
 with the same station set and dates retains previously loaded parameters.
 Selection or date-context changes isolate/reset those aggregate results.
+
+Choose All cataloged measurements to process the known parameter union in sequence, or All selected measurement types when optional checkboxes narrow it. Cancelled batches retain completed observations and manifests; never assume every requested parameter completed after cancellation.
