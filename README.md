@@ -83,14 +83,14 @@ raster resolution limit.
 ## Find stations by measurements
 
 Common checkboxes use the authoritative Water Atlas parameter IDs: TN 915,
-TP as P 923, and laboratory chlorophyll a 46 or 47. Corrected, uncorrected and
+phosphorus IDs matching phosphorus/phosphate definitions (including total, filterable, organic and orthophosphate), and laboratory chlorophyll a 46 or 47. Corrected, uncorrected and
 probe chlorophyll remain separate parameters for charts. More measurements
 provides the full searchable inventory definition list. Match all requires
 every selected group; match any requires at least one. Waterbody and station
 lists apply these filters together with the county and text search.
 
 `python refresh_parameters.py` prepares resumable batches of 500 station
-identities using create -> list inventory. The saved snapshot has 61,045
+identities using create -> list inventory. Add `--force` to recheck existing batches; changed station membership is refreshed automatically. The saved snapshot has 61,045
 checked identities and 171 unconfirmed identities. Only exact requested
 source/station identities are retained, even if a provider returns additional
 metadata rows. Missing inventory is not interpreted as no measurements.
@@ -98,8 +98,10 @@ Filtered choices exclude unconfirmed inventory; coverage and live retry
 controls show this limitation. Run the inventory refresh after discovery, then
 build and publish all county JSON files as well as index.html.
 
+Repeated-sampling coverage defaults to at least six distinct sampling dates per full year, with data in every quarter. Users can change the annual minimum or require every month. Each year is checked separately, and partial-year minimums are prorated by selected days and rounded up. Repeated measurements on one day count once. Phosphorus forms can jointly provide date coverage, while their values remain separate in charts.
+
 Optional date checking queries one station at a time (two concurrent workers),
-confirms its identity, and checks numeric graph observations within the chosen
+confirms its identity, and checks repeated sampling throughout the chosen
 period for each requested group. Checks follow the current search. Results
 are cached in memory by county, source/station, selection, match mode and dates.
 Cancellation and selection changes invalidate pending results. API failures

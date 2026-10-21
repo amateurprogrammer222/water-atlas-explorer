@@ -2,7 +2,7 @@
 <style>*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#183342;font:16px system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:28px}h1{margin:8px 0;font-size:32px}p{line-height:1.5}.muted{color:#536977}.card{padding:22px;background:white;border:1px solid #dce5ea;border-radius:12px;margin:18px 0}.row{display:flex;flex-wrap:wrap;gap:18px;align-items:end}label{display:flex;flex-direction:column;gap:7px;font-size:14px;flex:1;min-width:180px}input,select,button{font:inherit;padding:10px;border:1px solid #a8bbc6;border-radius:6px;background:white;color:#183342}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d39823}h2{font-size:20px;margin-top:0}dl{display:grid;grid-template-columns:170px 1fr;gap:12px}dt{color:#536977}dd{margin:0;overflow-wrap:anywhere}iframe{border:0;width:100%;height:1200px;background:#f3f6f8}#status{color:#536977}a{color:#176780}[hidden]{display:none!important}.small{font-size:14px}@media(max-width:600px){main{padding:14px}dl{grid-template-columns:1fr;gap:5px}dd{margin-bottom:10px}}.measurement-option{flex-direction:row;align-items:center;justify-content:flex-start;min-width:220px;padding:8px 0}.measurement-option input{flex:none}#othermeasurements{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));max-height:280px;overflow:auto;margin:12px 0}details{margin:16px 0}summary{cursor:pointer;font-weight:600;margin-bottom:12px}</style></head><body><main>
 <p class="muted small">WATER ATLAS EXPLORER · STATIC PILOT</p><h1>Start with a county.</h1><p class="muted">Choose a county, waterbody and station, then explore seasonal patterns, annual distributions, and monthly changes.</p>
 <section class="card"><h2>1. Choose a county</h2><p id="coverage" class="small" role="status">Choose a county to begin.</p><div class="row"><label>County<select id="county"></select></label><label>Search waterbody, station ID, or provider<input id="search" type="search" placeholder="Lake Manatee or UM2"></label></div></section>
-<section class="card"><h2>2. Find stations by measurements</h2><p class="small muted">Tick the measurements you need. Waterbody and station choices below will show confirmed matches.</p><div id="commonmeasurements" class="row" role="group" aria-label="Common measurements"></div><details><summary>More measurements</summary><label>Search measurements<input id="parametersearch" type="search" placeholder="Dissolved oxygen, turbidity, corrected chlorophyll…"></label><div id="othermeasurements" role="group" aria-label="Other measurements"></div></details><div class="row"><label>Stations must have<select id="measurementmatch"><option value="all">All selected measurements</option><option value="any">Any selected measurement</option></select></label><button id="clearmeasurements">Clear measurement filters</button></div><p id="filterstatus" role="status" class="small"></p><p class="small muted">TN uses total nitrogen, and TP uses total phosphorus as P. The chlorophyll shortcut accepts corrected or uncorrected laboratory results; probe chlorophyll is a separate choice under More measurements. Inventories describe availability, not sample quality.</p><details><summary>Optional: require observations within a date range</summary><label class="measurement-option"><input id="filterdates" type="checkbox"> Only show stations with confirmed observations in this period</label><div class="row"><label>Measurement period from<input id="filterfrom" type="date"></label><label>Measurement period through<input id="filterthrough" type="date"></label><button id="checkdates" disabled>Check dates</button><button id="stopdates" hidden>Stop date checks</button></div><p id="datestatus" class="small" role="status"></p><p class="small muted">Date checks follow the current waterbody/station search. Narrow the search first to check fewer stations. Checks query numeric observations for each selected measurement. Matching measurements may be sampled on different days within the period. Large counties can take several minutes; stop at any time. Unchecked or failed stations are excluded while date filtering is on.</p></details><details><summary>Inventory coverage</summary><button id="checkinventory" disabled>Check unverified stations</button><p id="inventorystatus" class="small" role="status"></p></details></section>
+<section class="card"><h2>2. Find stations by measurements</h2><p class="small muted">Tick the measurements you need. Waterbody and station choices below will show confirmed matches.</p><div id="commonmeasurements" class="row" role="group" aria-label="Common measurements"></div><details><summary>More measurements</summary><label>Search measurements<input id="parametersearch" type="search" placeholder="Dissolved oxygen, turbidity, corrected chlorophyll…"></label><div id="othermeasurements" role="group" aria-label="Other measurements"></div></details><div class="row"><label>Stations must have<select id="measurementmatch"><option value="all">All selected measurements</option><option value="any">Any selected measurement</option></select></label><button id="clearmeasurements">Clear measurement filters</button></div><p id="filterstatus" role="status" class="small"></p><p class="small muted">TN uses total nitrogen. Phosphorus — any form includes total, dissolved/filterable, organic, orthophosphate and other phosphate measurements. Different phosphorus forms can satisfy coverage together; their values remain separate in charts. The chlorophyll shortcut accepts corrected or uncorrected laboratory results; probe chlorophyll is a separate choice under More measurements. Inventories describe availability, not sample quality.</p><details><summary>Require repeated sampling throughout a date range</summary><label class="measurement-option"><input id="filterdates" type="checkbox"> Only show stations with repeated sampling throughout this period</label><div class="row"><label>Measurement period from<input id="filterfrom" type="date"></label><label>Measurement period through<input id="filterthrough" type="date"></label><label>Sampling spread<select id="coveragefrequency"><option value="quarter">At least once in every quarter</option><option value="month">At least once in every month</option></select></label><label>Minimum sampling dates per year<input id="minimumdates" type="number" min="1" max="366" step="1" value="6"></label><button id="checkdates" disabled>Check dates</button><button id="stopdates" hidden>Stop date checks</button></div><p id="datestatus" class="small" role="status"></p><p class="small muted">Date checks follow the current waterbody/station search. Narrow the search first to check fewer stations. Each matching measurement must meet the minimum number of distinct sampling dates in every year and the selected monthly or quarterly spread. Multiple measurements on the same day count as one sampling date. Partial years use a proportional minimum (rounded up), and every month or quarter touching the selected range must have data within that range. This confirms repeated sampling; it does not imply continuous daily monitoring. Large counties can take several minutes; stop at any time. Unchecked or failed stations are excluded while date filtering is on.</p></details><details><summary>Inventory coverage</summary><button id="checkinventory" disabled>Check unverified stations</button><p id="inventorystatus" class="small" role="status"></p></details></section>
 <section class="card"><h2>3. Choose a matching waterbody and station</h2><div class="row"><label>Waterbody<select id="waterbody"></select></label><label>Source code | station ID<select id="station"></select></label></div><p id="status" role="status">Choose a county to begin.</p></section>
 <section class="card"><h2>Station discovery</h2><p id="catalogstatus" class="small" role="status"></p><button id="refreshcatalog">Refresh station catalog</button><p class="small muted">Waterbodies without a verified association appear in the unassigned group. A catalog entry does not guarantee historical data can be retrieved.</p></section><section id="documentation" class="card" hidden><h2>Station documentation</h2><dl id="metadata"></dl><p><a id="source" target="_blank" rel="noopener">Official source data</a> · <a id="atlaslink" href="https://manatee.wateratlas.usf.edu/" target="_blank" rel="noopener">Manatee Water Atlas</a> · <a id="downloadslink" href="https://manatee.wateratlas.usf.edu/data-download/" target="_blank" rel="noopener">Water Atlas downloads</a></p><p class="small muted">Station identity is the data-source code plus station ID. Historical STORET and newer WIN records are kept separate. Source values have not been independently validated by a laboratory.</p></section>
 <section id="atlasretrieval" class="card" hidden><h2>Water Atlas sample data</h2><div class="row"><label>From<input id="atlasstart" type="date"></label><label>Through<input id="atlasend" type="date"></label><label>Water Atlas parameter<select id="atlasparameter"></select></label></div><p id="atlasstatus" role="status"></p><button id="atlasload">Load available measurements</button><p class="small muted">Graph results omit sampling depths and quality flags. Use the full official export when those fields are needed.</p></section><section id="retrieval" class="card" hidden><h2>Retrieve measurements</h2><div class="row"><label>Daily-data period<select id="retrievaldays"><option value="365">Last year</option><option value="1825">Last 5 years</option><option value="3650">Last 10 years</option></select></label><label><span>Provisional values</span><span><input id="provisional" type="checkbox"> Include USGS provisional values in charts</span></label></div><p id="retrievalstatus" role="status"></p><button id="loadmeasurements">Load daily measurements</button></section><section id="measurement" class="card" hidden><h2>4. Choose a measurement and view</h2><div class="row"><label>Parameter<select id="parameter"></select></label><label>Unit<select id="units"></select></label><label>Sampling depth<select id="depth"></select></label><label>View<select id="view"><option value="seasonal">Seasonal box plots</option><option value="annual">Annual box plots</option><option value="heatmap">Year–month heatmap</option></select></label></div><p id="quality" class="small" role="status"></p><button id="download">Download selected source records</button> <button id="exportpng" disabled>Download graph PNG</button> <button id="exportsvg" disabled>Download graph SVG</button><p id="exportstatus" class="small" role="status">PNG images work in PowerPoint. SVG images stay sharp when resized. Exports include the current chart filters and source details.</p><p class="small muted">Chart controls below provide dates, 0–6 decimal places, scales, and filtered numeric downloads. Full source downloads retain qualified results and original numeric precision. Select a new view to reset chart filters.</p></section>
@@ -161,12 +161,13 @@ function download(){const rows=selectedRows();if(!rows.length)return;const keys=
 byId('search').addEventListener('input',findPlace);byId('waterbody').addEventListener('change',chooseWaterbody);byId('station').addEventListener('change',chooseStation);byId('parameter').addEventListener('change',chooseParameter);byId('units').addEventListener('change',chooseUnit);byId('depth').addEventListener('change',draw);byId('view').addEventListener('change',draw);byId('download').addEventListener('click',download);byId('county').addEventListener('change',chooseCounty);options('county',payload.counties.map(c=>c.id),'Choose a county');for(const option of byId('county').children){const county=payload.counties.find(c=>c.id===option.value);if(county)option.textContent=county.name;}chooseCounty();
 
 // Measurement availability is based on each station's authoritative ParameterList.
+const parameterDefinitions=payload.parameter_definitions||[];
+const phosphorusIds=parameterDefinitions.filter(p=>/phosphorus|phosphate/i.test(p.DisplayName)).map(p=>Number(p.Id));
 const measurementGroups=[
  {key:'tn',label:'Total nitrogen (TN)',ids:[915]},
- {key:'tp',label:'Total phosphorus (TP)',ids:[923]},
+ {key:'tp',label:'Phosphorus — any form',ids:phosphorusIds},
  {key:'chla',label:'Chlorophyll a (corrected or uncorrected)',ids:[46,47]}
 ];
-const parameterDefinitions=payload.parameter_definitions||[];
 let requestedGroupsCache=null;
 let dateScanToken=0,dateScanBusy=false,dateResults=new Map(),inventoryScanToken=0;
 function sourceStationKey(s){return `${s.ds}|${s.id}`;}
@@ -176,13 +177,31 @@ function requestedMeasurements(){
  return requestedGroupsCache=[...groups,...parameterDefinitions.filter(p=>byId('want-param-'+p.Id).checked).map(p=>({key:'param-'+p.Id,label:p.DisplayName,ids:[Number(p.Id)]}))];
 }
 function measurementMode(){return byId('measurementmatch').value==='any'?'any':'all';}
+function coveragePolicy(){return {frequency:byId('coveragefrequency').value==='month'?'month':'quarter',minimum:Math.max(1,Math.min(366,Math.ceil(Number(byId('minimumdates').value)||6)))};}
+function samplingCoverage(dateStrings,dates,policy=coveragePolicy()){
+ const start=dates.startDate.slice(0,10),end=dates.endDate.slice(0,10),first=new Date(start+'T00:00:00Z'),last=new Date(end+'T00:00:00Z');
+ if(!Number.isFinite(+first)||!Number.isFinite(+last)||first>last)throw Error('Invalid sampling period');
+ const bucket=date=>policy.frequency==='month'?date.slice(0,7):date.slice(0,4)+'-Q'+(Math.floor((Number(date.slice(5,7))-1)/3)+1);
+ const required=new Set();
+ for(let month=new Date(Date.UTC(first.getUTCFullYear(),first.getUTCMonth(),1));month<=last;month.setUTCMonth(month.getUTCMonth()+1))required.add(bucket(month.toISOString().slice(0,10)));
+ const datesFound=[...new Set(dateStrings)].filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date)&&date>=start&&date<=end),found=new Set(datesFound.map(bucket));
+ const years=[];
+ for(let year=first.getUTCFullYear();year<=last.getUTCFullYear();year++){
+  const a=Date.UTC(year,0,1),b=Date.UTC(year+1,0,1),selectedDays=(Math.min(+last+86400000,b)-Math.max(+first,a))/86400000;
+  const minimum=Math.max(1,Math.ceil(policy.minimum*selectedDays/((b-a)/86400000)-1e-10));
+  const observed=datesFound.filter(date=>Number(date.slice(0,4))===year).length;
+  years.push({year,observed,minimum});
+ }
+ const missing=[...required].filter(key=>!found.has(key));
+ return {meets:missing.length===0&&years.every(y=>y.observed>=y.minimum),years,missing,frequency:policy.frequency};
+}
 function lifetimeMeasurementMatch(s){
  const groups=requestedMeasurements();if(!groups.length)return true;
  const inventory=s?.measurement_inventory;if(inventory?.status!=='checked')return false;
  const ids=new Set(inventory.ids.map(Number)),matches=groups.map(g=>g.ids.some(id=>ids.has(id)));
  return measurementMode()==='any'?matches.some(Boolean):matches.every(Boolean);
 }
-function dateFilterKey(){return JSON.stringify([byId('county').value,measurementMode(),requestedMeasurements().map(g=>g.key).sort(),byId('filterfrom').value,byId('filterthrough').value]);}
+function dateFilterKey(){return JSON.stringify([byId('county').value,measurementMode(),requestedMeasurements().map(g=>g.key).sort(),byId('filterfrom').value,byId('filterthrough').value,coveragePolicy()]);}
 function dateStationKey(s){return dateFilterKey()+'|'+sourceStationKey(s);}
 function stationMatchesMeasurements(s){
  if(!requestedMeasurements().length)return true;
@@ -198,7 +217,7 @@ function measurementDateCandidates(){
 function renderMeasurementSummary(){
  const county=selectedCounty(),stations=catalogRows(),groups=requestedMeasurements(),checked=stations.filter(s=>s.measurement_inventory?.status==='checked').length;
  const lifetime=measurementDateCandidates(),matches=stations.filter(stationMatchesMeasurements);
- byId('filterstatus').textContent=!county?'Choose a county, then tick the measurements you need.':!groups.length?'No measurement filter applied. All discovered stations are available.':`${matches.length} matching station entries · ${checked} inventories checked · ${stations.length-checked} unverified entries excluded. ${byId('filterdates').checked?'Date checks confirm numeric observations in the chosen period; they do not require sampling on the same day.':'Availability covers the station inventory, not a shared sampling period.'}`;
+ byId('filterstatus').textContent=!county?'Choose a county, then tick the measurements you need.':!groups.length?'No measurement filter applied. All discovered stations are available.':`${matches.length} matching station entries · ${checked} inventories checked · ${stations.length-checked} unverified entries excluded. ${byId('filterdates').checked?'Coverage checks require repeated sampling in every selected year and '+(coveragePolicy().frequency==='month'?'month.':'quarter.'):'Availability covers the station inventory, not a shared sampling period.'}`;
  byId('checkdates').disabled=!county||!groups.length||!byId('filterdates').checked||dateScanBusy||!lifetime.length;
  byId('checkdates').textContent=`Check dates for ${lifetime.length} candidate stations`;
  byId('stopdates').hidden=!dateScanBusy;
@@ -229,22 +248,26 @@ async function checkStationDateRange(s,groups,mode,dates,token){
  const inventory=await atlasAPI('list?id='+encodeURIComponent(id));active();
  if(!inventory?.Stations?.some(st=>`${st.DataSource}|${st.StationID}`===key))throw Error('Station identity was not confirmed');
  await atlasAPI('update',{requestId:id,stations:key,parameters:selected.join(','),...dates,siteId:s.sid,save:true,email:''});active();
- let uncertain=false;
+ let uncertain=false;const coverage=[];
  for(const group of usable){
-  let found=false,failed=false;
+  let found=false,failed=false;const observedDates=new Set();let summary;
   for(const parameter of group){
    try{
     const points=await atlasAPI(`graph?requestId=${id}&parameterId=${parameter}`);active();
     if(!Array.isArray(points))throw Error('Invalid graph response');
-    found=points.some(p=>p.ResultValue!==null&&p.ResultValue!==''&&Number.isFinite(Number(p.ResultValue))&&typeof p.SampleDate==='string'&&p.SampleDate.slice(0,10)>=dates.startDate.slice(0,10)&&p.SampleDate.slice(0,10)<=dates.endDate.slice(0,10));
+    for(const p of points)if(p.ResultValue!==null&&p.ResultValue!==''&&Number.isFinite(Number(p.ResultValue))&&typeof p.SampleDate==='string'){
+     const date=p.SampleDate.slice(0,10);if(date>=dates.startDate.slice(0,10)&&date<=dates.endDate.slice(0,10))observedDates.add(date);
+    }
+    summary=samplingCoverage([...observedDates],dates,coveragePolicy());found=summary.meets;
     if(found)break;
    }catch(e){active();failed=true;}
   }
-  if(mode==='any'&&found)return {status:'match',request_id:id,checked_at:new Date().toISOString()};
-  if(mode==='all'&&!found&&!failed)return {status:'no-match',request_id:id};
+  coverage.push(summary||samplingCoverage([],dates,coveragePolicy()));
+  if(mode==='any'&&found)return {status:'match',request_id:id,coverage,checked_at:new Date().toISOString()};
+  if(mode==='all'&&!found&&!failed)return {status:'no-match',request_id:id,coverage};
   if(!found&&failed)uncertain=true;
  }
- return {status:uncertain?'unverified':mode==='all'?'match':'no-match',request_id:id,checked_at:new Date().toISOString()};
+ return {status:uncertain?'unverified':mode==='all'?'match':'no-match',request_id:id,coverage,checked_at:new Date().toISOString()};
 }
 async function checkMeasurementDates(){
  const from=byId('filterfrom').value,through=byId('filterthrough').value,groups=requestedMeasurements();
@@ -262,7 +285,7 @@ async function checkMeasurementDates(){
   }
  }
  await Promise.all([worker(),worker()]);
- if(token===dateScanToken){dateScanBusy=false;findPlace();byId('datestatus').textContent=`Date checks complete: ${matched} confirmed matching entries; ${done-matched-failed} without matching numeric observations; ${failed} unverified. Quality flags and sample depths are unavailable from the graph service.`;}
+ if(token===dateScanToken){dateScanBusy=false;findPlace();byId('datestatus').textContent=`Date checks complete: ${matched} confirmed matching entries; ${done-matched-failed} without the required sampling coverage; ${failed} unverified. Quality flags and sample depths are unavailable from the graph service.`;}
 }
 async function checkUnverifiedInventories(){
  const county=selectedCounty();if(!county)return;const token=++inventoryScanToken;
@@ -288,7 +311,7 @@ for(const p of [...parameterDefinitions].sort((a,b)=>a.DisplayName.localeCompare
  const label=document.createElement('label'),input=document.createElement('input');label.className='measurement-option';input.type='checkbox';input.id='want-param-'+p.Id;input.addEventListener('change',applyMeasurementFilter);label.append(input,document.createTextNode(p.DisplayName));byId('othermeasurements').append(label);
 }
 byId('parametersearch').addEventListener('input',()=>{const q=byId('parametersearch').value.trim().toLowerCase();for(const label of byId('othermeasurements').children)label.hidden=!label.textContent.toLowerCase().includes(q);});
-for(const id of ['measurementmatch','filterdates','filterfrom','filterthrough'])byId(id).addEventListener('change',applyMeasurementFilter);
+for(const id of ['measurementmatch','filterdates','filterfrom','filterthrough','coveragefrequency','minimumdates'])byId(id).addEventListener('change',applyMeasurementFilter);
 byId('clearmeasurements').addEventListener('click',clearMeasurementFilters);byId('checkdates').addEventListener('click',checkMeasurementDates);byId('stopdates').addEventListener('click',()=>stopDateChecks());byId('checkinventory').addEventListener('click',checkUnverifiedInventories);
 byId('county').addEventListener('change',()=>{stopDateChecks(true);inventoryScanToken++;byId('datestatus').textContent='';byId('inventorystatus').textContent='';});
 byId('search').addEventListener('input',()=>{if(dateScanBusy)stopDateChecks(true);});
@@ -297,6 +320,12 @@ function appendMeasurementInventory(s){
  if(!s)return;const inventory=s.measurement_inventory;
  const fields=[['Available measurements',inventory?.status==='checked'?inventory.ids.map(id=>parameterDefinitions.find(p=>Number(p.Id)===id)?.DisplayName||('Parameter '+id)).join('; '):'Not verified'],['Inventory checked',inventory?.checked_at||'Not verified'],['Inventory source',inventory?.source_url||'Not verified']];
  for(const [key,value] of fields){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=value;byId('metadata').append(dt,dd);}
+ const coverage=byId('filterdates').checked?dateResults.get(dateStationKey(s))?.coverage:null;
+ if(coverage){
+  const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent='Confirmed sampling coverage';
+  dd.textContent=coverage.map((group,i)=>(requestedMeasurements()[i]?.label||'Measurement')+': '+group.years.map(y=>`${y.year}: ${y.observed} distinct dates (minimum ${y.minimum})`).join('; ')+(group.meets?' — meets coverage':' — does not meet coverage')).join(' | ');
+  byId('metadata').append(dt,dd);
+ }
 }
 
 // Catalog discovery is independent of measurement availability.
@@ -336,7 +365,8 @@ chooseStation=function(){
  byId('loadmeasurements').disabled=s.ds!=='USGS_NWIS';
  if(stationRows().length)return;
  byId('documentation').hidden=false;byId('measurement').hidden=true;byId('metadata').replaceChildren();
- for(const [k,v]of [['Station ID',s.id],['Source code',s.ds],['Station name',s.name],['Provider',s.agency||(s.ds==='USGS_NWIS'?'U.S. Geological Survey':s.ds)],['Coordinates',`${s.lat}, ${s.lng}`],['Atlas',s.atlas],['County (source field)',s.county||'Not supplied'],['Waterbody association',s.waterbody||'Not supplied'],['Available measurements',s.measurement_inventory?.status==='checked'?s.measurement_inventory.ids.map(id=>parameterDefinitions.find(p=>Number(p.Id)===id)?.DisplayName||('Parameter '+id)).join('; '):'Not verified'],['Inventory checked',s.measurement_inventory?.checked_at||'Not verified'],['Inventory source',s.measurement_inventory?.source_url||'Not verified'],['Catalog status',s.status],['Catalog retrieved',payload.discovery?.retrieved_at||'Refreshed in browser']]){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=String(v);byId('metadata').append(dt,dd)}
+ for(const [k,v]of [['Station ID',s.id],['Source code',s.ds],['Station name',s.name],['Provider',s.agency||(s.ds==='USGS_NWIS'?'U.S. Geological Survey':s.ds)],['Coordinates',`${s.lat}, ${s.lng}`],['Atlas',s.atlas],['County (source field)',s.county||'Not supplied'],['Waterbody association',s.waterbody||'Not supplied'],['Catalog status',s.status],['Catalog retrieved',payload.discovery?.retrieved_at||'Refreshed in browser']]){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=String(v);byId('metadata').append(dt,dd)}
+ appendMeasurementInventory(s);
  byId('source').href=s.ds==='USGS_NWIS'?`https://waterdata.usgs.gov/monitoring-location/USGS-${encodeURIComponent(s.id)}/`:selectedCounty().atlas_url+'data-download/';
 };
 function parseUSGS(data,s,body,url,includeProvisional){
