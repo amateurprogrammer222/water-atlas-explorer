@@ -1,6 +1,6 @@
 # Water Atlas Explorer
 
-Choose Manatee County, a named waterbody, and a source/station identity. Click
+Choose Manatee or Hillsborough County, a named waterbody, and a source/station identity. Click
 **Load available measurements** to request Water Atlas parameters. The first
 parameter is plotted automatically; choosing another Water Atlas parameter
 retrieves and plots it. Change the dates and click Load available measurements
@@ -13,7 +13,7 @@ The authoritative Water Atlas sampling-location GIS layer provides county,
 waterbody, station, provider, coordinates, record count and coverage fields:
 https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/WaterAtlas_DataDownload/MapServer/0
 
-The saved October 21, 2026 query returned 1,400 entries with COUNTY='Manatee'
+The saved October 21, 2026 query returned 7,962 Hillsborough entries in 401 named source waterbody-ID groups, and 1,400 entries with COUNTY='Manatee'
 and DATACOUNT>0, grouped into 93 named source waterbody-ID groups (including
 source placeholders for groundwater/unmapped locations). Station identities
 remain source code plus station ID. This catalog includes hydrology and
