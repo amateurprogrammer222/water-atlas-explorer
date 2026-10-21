@@ -110,3 +110,30 @@ Matching measurements may be collected on different days within the period.
 The graph API does not supply sample quality flags or depths. Live date checks
 can be slow for large selections; narrow the search or stop and use completed
 results. Selecting a station carries the checked period into graph retrieval.
+
+## Waterbody aggregation
+
+Choose county and waterbody first. Measurement checkboxes are optional and
+filter stations within that waterbody; they do not remove the waterbody choice.
+Choose either one specific station or aggregation across all matching source/
+station identities. Aggregation is limited to the selected county and a named,
+positive GIS waterbody ID. Alias names with the same ID are included; generic
+unassigned/groundwater placeholders cannot be pooled.
+
+The aggregator retrieves each station separately, confirms its exact source/
+station identity and parameter inventory, then requests one parameter and date
+range. Two workers run concurrently. Records retain source code, station ID,
+provider, coordinates, original waterbody association, parameter ID, units,
+request ID and source URL. Parameters and units remain separate in charts.
+Graphs pool observations rather than averaging station means: frequently
+sampled stations contribute more observations. Potentially overlapping legacy
+and newer provider records are retained rather than silently deduplicated.
+
+The manifest includes all eligible identities and reports loaded, not measured,
+no observations in period, failed or not checked. Cancellation retains completed
+records as an explicitly partial result. Partial results are disclosed in the
+chart and exported images. The graph API omits quality flags and depths. These
+are not reconstructed. Selected graph records, all loaded waterbody parameters,
+and a station manifest can be downloaded separately. Loading another parameter
+with the same station set and dates retains previously loaded parameters.
+Selection or date-context changes isolate/reset those aggregate results.
