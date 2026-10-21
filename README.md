@@ -1,58 +1,65 @@
-# Water Atlas static explorer
+# Water Atlas Explorer
 
-## Discovery and retrieval release
+Choose Manatee County, a named waterbody, and a source/station identity. Click
+**Load available measurements** to request Water Atlas parameters. The first
+parameter is plotted automatically; choosing another Water Atlas parameter
+retrieves and plots it. Change the dates and click Load available measurements
+to start a new date-range request. Chart views include seasonal boxes, annual
+boxes, and a year/month heatmap, with 0–6 display decimal places.
 
-The saved Water Atlas DataMapper catalog contains 53 Manatee Atlas entries.
-The county selector uses Atlas membership, which is not a verified geographic
-county assignment. Historical sample stations are not comprehensively covered
-by this real-time-oriented catalog. Missing waterbody associations are explicitly
-grouped as unassigned. UM2 retains its verified Lake Manatee association.
+## Discovery
 
-Refresh station catalog requests the public Water Atlas API; if unavailable or
-blocked by browser CORS rules, the saved snapshot stays available. Run
-`python refresh_discovery.py` to refresh the embedded snapshot before rebuilding.
+The authoritative Water Atlas sampling-location GIS layer provides county,
+waterbody, station, provider, coordinates, record count and coverage fields:
+https://gis.waterinstitute.usf.edu/arcgis/rest/services/Maps/WaterAtlas_DataDownload/MapServer/0
 
-Discovered USGS_NWIS stations support on-demand daily-value retrieval directly
-from USGS for 1, 5 or 10 years. These are daily statistical measurements, not
-discrete Water Atlas laboratory samples. Parameter code, unit, statistic and
-original provider qualifiers are preserved. Only A-approved values are charted
-by default. The optional provisional setting allows P values; other flagged
-values stay excluded. Downloads retain their original flags. Provider no-data
-sentinels are omitted. The response station ID is checked. Requests time out,
-and switching selections prevents stale responses from changing the new view.
+The saved October 21, 2026 query returned 1,400 entries with COUNTY='Manatee'
+and DATACOUNT>0, grouped into 93 named source waterbody-ID groups (including
+source placeholders for groundwater/unmapped locations). Station identities
+remain source code plus station ID. This catalog includes hydrology and
+other monitoring types as well as discrete water quality. Count and coverage
+metadata do not guarantee every parameter has observations in every date range.
 
-Other providers are discoverable but automated measurement retrieval is not yet
-supported. The Atlas latest-measurement service timed out during verification;
-its documented datadownload/list POST endpoint returned a deprecation message.
-This release does not claim all county stations or all provider histories.
+Refresh station catalog uses paginated GIS queries. If unavailable, the saved
+snapshot remains. Names and county assignments come from source fields, not
+inference from station names. Missing associations retain an unassigned group.
 
-Direct retrieval uses public CORS-enabled USGS Water Services, with no API key.
-If USGS retires this service, the adapter will need migration. Data stays in the
-current browser tab and is lost on reload unless downloaded. Tested against 365
-daily flow records from USGS station 02298530 (Coker Creek).
+## Measurement retrieval
 
-Open index.html directly in a modern browser, or serve this folder with any static host. No API key, Python server, account, or network request is needed to explore the data. The verified station extract and chart code are embedded.
+Historical Water Atlas graph retrieval uses create -> list?id -> update -> graph.
+The obsolete POST datadownload/list endpoint is not used. A single source/station
+is selected, and its returned metadata is checked before charting. Source URL,
+request ID and retrieval time are shown. The graph endpoint omits quality flags
+and sample depths, so these results cannot be filtered by qualifier or depth.
+Charts and metadata explicitly disclose that limitation. Use the full official
+row-format export for qualified/depth-specific analysis. Original UM2 verified
+rows retain their full original fields and conservative qualifier filtering.
 
-Choose county, waterbody, source/station, parameter, unit and depth. Chart controls include dates, decimal places, and scale. Changing the outer selection resets chart filters. Only waterbodies with loaded records appear. The Manatee County pilot includes WIN_21FLMANA|UM2 only. No automatic refresh or full Atlas catalog is claimed.
+USGS stations also offer direct daily-value retrieval for 1/5/10 years. These
+are daily statistics, not discrete sample observations. Parameter codes, units,
+statistics and approval flags are retained. Only approved values are plotted
+by default; provisional values can be enabled before loading.
 
-## County expansion
+Browser requests time out and show failures rather than silently drawing no
+chart. Empty date ranges show guidance to widen the period. Selection changes
+invalidate in-flight requests. Data stays in the browser tab until reload;
+download the selected source records to keep it. Display rounding does not
+change values used in calculations or downloads.
 
-The source project's data/counties.json maps county IDs and names to reviewed CSV extracts and per-extract provenance manifests. Adding reviewed station extracts to a county automatically expands its waterbody and station lists on rebuild. Adding a county entry provides another county choice without editing the chart logic. County changes clear prior selections; identical station IDs in different counties or sources are kept separate.
+## Build and hosting
 
-Each dataset manifest must record its original download URL, request ID, retrieval date, checksum, station key and record count. A dataset is currently one source/station extract. Assign counties using verified geographic metadata, not solely the Atlas site name; watershed and Atlas boundaries may cross county lines.
+No continuous Python server, paid database, AI service or API key is required.
+The index.html is a static browser application on GitHub Pages. The catalog and
+UM2 extract are bundled; live refresh/retrieval needs network access and CORS.
 
-As of October 21, 2026, the official waterbody search endpoint returned a missing-database-procedure error, the documented water-quality trends station endpoint reported not implemented, and the legacy county-filter download form returned an unexpected error. Accordingly, this release adds the county-first workflow but does not claim countywide data completeness. Additional stations require verified exports before they become selectable.
+Run `python refresh_discovery.py`, then `python build_static.py` in the source
+project. Both use the standard library. Build dependencies include the chart
+source templates/scripts and data/counties.json, data/discovery.json, plus the
+verified station extracts. Upload static_site/index.html and README.md to the
+public repository. Publishing is separate from building. Avoid uploading local
+environments or unrelated files. The browser app cannot run from a local file
+with live retrieval if browser security blocks its requests; use the HTTPS site.
 
-## Free GitHub Pages deployment
-
-Create a public repository, upload index.html and .nojekyll at its root, then choose Settings → Pages → Deploy from a branch → main / root. No build workflow is necessary. README.md is optional. Public publishing has not been performed by the build script.
-
-## Rebuild
-
-Run `python build_static.py` in the source project after preparing the verified station extract. Python's standard library is sufficient for this build. The generator reuses seasonal_template.html, annual_boxplots.py, seasonal_boxplots.py, the generated lake_manatee_heatmap.html, explorer_shell.html and explorer.js. Run `python heatmap.py` first after changing the heatmap source.
-
-Data source: https://manatee.wateratlas.usf.edu/datadownload/downloads/DataDownload-989861.xlsx
-
-Provider: Manatee County Environmental Management Sampling Data. Aggregator: USF Water Atlas. The official multi-station workbook supplied 920 WIN_21FLMANA|UM2 records on 85 sampling dates, January 17, 2018–May 5, 2026. Source code and station ID are preserved as strings. Unit and depth groups remain separate. Qualified and nonnumeric results are excluded from charts, retained in full source downloads. Values are not rounded for calculations or downloads. Changing display precision is cosmetic.
-
-Source-record download uses the outer parameter/unit/depth selection, retaining all dates; the chart's own CSV download uses its inner date filters and includes only numeric chart records. Repeated observations are not deduplicated. Methods are not independently validated. These charts do not establish safety or causation.
+Checks: `node test_static.cjs` covers county selection, source/station identity,
+GIS waterbodies, chart renderers, precision, Water Atlas create/list/update/graph,
+empty-result recovery and original USGS qualifier handling.
