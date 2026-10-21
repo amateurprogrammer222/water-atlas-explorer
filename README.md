@@ -139,3 +139,28 @@ with the same station set and dates retains previously loaded parameters.
 Selection or date-context changes isolate/reset those aggregate results.
 
 Choose All cataloged measurements to process the known parameter union in sequence, or All selected measurement types when optional checkboxes narrow it. Cancelled batches retain completed observations and manifests; never assume every requested parameter completed after cancellation.
+
+## Choose contributing stations and station colors
+
+Analysis choices include all eligible stations, a custom multi-station checklist,
+one specific station, or multiple entered station IDs. The checkbox selection
+controls plot membership independently of downloaded records. Existing data
+redraw without another request; adding a station without retrieved observations
+requires loading data. The complete retrieved-data download retains all input
+records, while selected-source CSVs reflect plot membership. The manifest marks
+which station identities are currently selected.
+
+Pasted IDs resolve within the selected county/waterbody and current parameter/
+coverage filters. Accept newline, comma, semicolon or tab separators, with quoted
+IDs supported. Exact SOURCE|StationID keys identify one source record. Bare IDs
+with multiple providers are flagged as ambiguous and require explicit checkbox
+selection. Leading zeros are preserved; duplicates are removed. Unmatched,
+filtered and outside-waterbody IDs have separate diagnostics. No cross-waterbody
+records are silently pooled.
+
+Seasonal and annual points carry station identities and use consistent colors
+from the complete waterbody source/station list, so subsets and parameters do
+not reshuffle colors. Outliers use a dark outline rather than a different fill.
+A station legend appears on the page and in PNG/SVG exports. Heatmap colors
+continue to represent values/counts; cell observation tables show source/station
+IDs with their station colors. Filtered chart CSVs also retain station IDs.
