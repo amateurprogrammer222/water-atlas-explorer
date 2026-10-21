@@ -2,7 +2,15 @@
 
 Open index.html directly in a modern browser, or serve this folder with any static host. No API key, Python server, account, or network request is needed to explore the data. The verified station extract and chart code are embedded.
 
-Choose waterbody, source/station, parameter, unit and depth. Chart controls include dates, decimal places, and scale. Changing the outer selection resets chart filters. The pilot includes WIN_21FLMANA|UM2 only. No automatic refresh or full Atlas catalog is claimed.
+Choose county, waterbody, source/station, parameter, unit and depth. Chart controls include dates, decimal places, and scale. Changing the outer selection resets chart filters. Only waterbodies with loaded records appear. The Manatee County pilot includes WIN_21FLMANA|UM2 only. No automatic refresh or full Atlas catalog is claimed.
+
+## County expansion
+
+The source project's data/counties.json maps county IDs and names to reviewed CSV extracts and per-extract provenance manifests. Adding reviewed station extracts to a county automatically expands its waterbody and station lists on rebuild. Adding a county entry provides another county choice without editing the chart logic. County changes clear prior selections; identical station IDs in different counties or sources are kept separate.
+
+Each dataset manifest must record its original download URL, request ID, retrieval date, checksum, station key and record count. A dataset is currently one source/station extract. Assign counties using verified geographic metadata, not solely the Atlas site name; watershed and Atlas boundaries may cross county lines.
+
+As of October 21, 2026, the official waterbody search endpoint returned a missing-database-procedure error, the documented water-quality trends station endpoint reported not implemented, and the legacy county-filter download form returned an unexpected error. Accordingly, this release adds the county-first workflow but does not claim countywide data completeness. Additional stations require verified exports before they become selectable.
 
 ## Free GitHub Pages deployment
 
