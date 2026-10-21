@@ -79,3 +79,32 @@ source URL, retrieval time and quality/depth limitations. Insert the saved
 image into PowerPoint using Insert > Pictures. CSV downloads are separate.
 Tall heatmaps are scaled to keep the PNG below 16,000 pixels high; SVG has no
 raster resolution limit.
+
+## Find stations by measurements
+
+Common checkboxes use the authoritative Water Atlas parameter IDs: TN 915,
+TP as P 923, and laboratory chlorophyll a 46 or 47. Corrected, uncorrected and
+probe chlorophyll remain separate parameters for charts. More measurements
+provides the full searchable inventory definition list. Match all requires
+every selected group; match any requires at least one. Waterbody and station
+lists apply these filters together with the county and text search.
+
+`python refresh_parameters.py` prepares resumable batches of 500 station
+identities using create -> list inventory. The saved snapshot has 61,045
+checked identities and 171 unconfirmed identities. Only exact requested
+source/station identities are retained, even if a provider returns additional
+metadata rows. Missing inventory is not interpreted as no measurements.
+Filtered choices exclude unconfirmed inventory; coverage and live retry
+controls show this limitation. Run the inventory refresh after discovery, then
+build and publish all county JSON files as well as index.html.
+
+Optional date checking queries one station at a time (two concurrent workers),
+confirms its identity, and checks numeric graph observations within the chosen
+period for each requested group. Checks follow the current search. Results
+are cached in memory by county, source/station, selection, match mode and dates.
+Cancellation and selection changes invalidate pending results. API failures
+remain unverified; they are never marked as a confirmed absence of data.
+Matching measurements may be collected on different days within the period.
+The graph API does not supply sample quality flags or depths. Live date checks
+can be slow for large selections; narrow the search or stop and use completed
+results. Selecting a station carries the checked period into graph retrieval.
