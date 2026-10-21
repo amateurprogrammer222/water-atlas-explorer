@@ -251,7 +251,7 @@ function atlasDates(){const a=byId('atlasstart').value,b=byId('atlasend').value;
 async function loadAtlasParameters(){
  const s=discoveredStation();if(!s)return;const token=++retrievalGeneration,key=`${s.ds}|${s.id}`;byId('atlasload').disabled=true;byId('atlasstatus').textContent='Requesting available parameters from Water Atlas…';
  try{
-  const dates=atlasDates(),id=await atlasAPI('create',{stations:key,parameters:null,...dates,siteId:5,save:false,email:''});
+  const dates=atlasDates(),id=await atlasAPI('create',{stations:key,parameters:"95",...dates,siteId:5,save:false,email:''});
   if(token!==retrievalGeneration)return;if(!Number.isInteger(Number(id)))throw Error('Unexpected request ID.');
   const inventory=await atlasAPI('list?id='+encodeURIComponent(id));if(token!==retrievalGeneration)return;
   if(!inventory?.Stations?.some(st=>`${st.DataSource}|${st.StationID}`===key))throw Error('Station identity not confirmed by download service.');
@@ -281,5 +281,6 @@ async function loadAtlasGraph(){
 }
 byId('station').addEventListener('change',chooseStation);byId('atlasload').addEventListener('click',loadAtlasParameters);byId('atlasparameter').addEventListener('change',loadAtlasGraph);
 for(const id of ['county','waterbody'])byId(id).addEventListener('change',()=>{atlasSelection=null;byId('atlasretrieval').hidden=true});
+
 
 </script></body></html>
