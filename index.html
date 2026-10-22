@@ -157,7 +157,7 @@ function chooseParameter(){options('units',unique(parameterRows().map(r=>r.Resul
 function chooseUnit(){options('depth',unique(parameterRows().filter(r=>r.ResultUnit===byId('units').value).map(depthKey)));draw()}
 function selectedRows(){return parameterRows().filter(r=>r.ResultUnit===byId('units').value&&depthKey(r)===byId('depth').value)}
 function chartRecords(rows){return rows.filter(r=>!(r.ValueQualifier||'').trim()&&r.numeric!==null).map(r=>[r.date,r.numeric,stationKey(r)]).sort((a,b)=>a[0].localeCompare(b[0]))}
-function draw(){clearChart();const rows=selectedRows(),valid=chartRecords(rows),qualified=rows.filter(r=>(r.ValueQualifier||'').trim()).length,invalid=rows.filter(r=>r.numeric===null).length;byId('quality').textContent=`${rows.length} selected source records · ${valid.length} charted · ${qualified} qualified · ${invalid} invalid numeric results. Qualified or invalid results are excluded from charts; counts may overlap.`;if(rows[0]?.RetrievalGroup)byId('quality').textContent=`${rows.length} numeric graph observations. Quality flags and depths are not supplied; qualifier filtering is unavailable.`;if(rows.length)byId('source').href=payload.reports[rows[0].ProvenanceKey].source_url;if(!valid.length){byId('empty').textContent='No unqualified numeric observations in this selection.';return}const name=`${byId('parameter').value} (${byId('units').value}) · ${selectionIdentity()} · Depth: ${byId('depth').value}`;const dataset=[{name,file:`Source ${payload.reports[rows[0].ProvenanceKey].request_id} · ${selectionIdentity()}`,rows:valid,rejected:0}];const frame=byId('chartframe'),root=frame.shadowRoot||frame.attachShadow({mode:'open'}),view=byId('view').value;let chartMarkup=rows[0].RetrievalGroup?payload.markup[view].replace('Qualified and invalid numeric results were excluded; source downloads retain them.','The Water Atlas graph API omits quality flags, so no qualifier filtering was possible.').replace('This chart contains one selected source/station, unit and depth group.','One station and parameter are selected. Sampling depths are unavailable and may be pooled.'):payload.markup[view];if(aggregateMode())chartMarkup=chartMarkup.replace('One station and parameter are selected. Sampling depths are unavailable and may be pooled.','Observations are pooled across the contributing source/station identities for one parameter and unit. Depths are unavailable. Stations sampled more frequently contribute more records; overlapping legacy and newer series may repeat observations.');root.innerHTML=chartMarkup;const localDocument={getElementById:id=>root.getElementById(id),createElement:tag=>document.createElement(tag),createElementNS:(ns,tag)=>document.createElementNS(ns,tag)};try{renderers[view](localDocument,dataset);frame.hidden=false;}catch(error){root.replaceChildren();byId('empty').textContent='Could not draw this selection: '+error.message;}}
+function draw(){clearChart();const rows=selectedRows(),valid=chartRecords(rows),qualified=rows.filter(r=>(r.ValueQualifier||'').trim()).length,invalid=rows.filter(r=>r.numeric===null).length;byId('quality').textContent=`${rows.length} selected source records · ${valid.length} charted · ${qualified} qualified · ${invalid} invalid numeric results. Qualified or invalid results are excluded from charts; counts may overlap.`;if(rows[0]?.RetrievalGroup)byId('quality').textContent=`${rows.length} numeric graph observations. Quality flags and depths are not supplied; qualifier filtering is unavailable.`;if(rows.length)byId('source').href=payload.reports[rows[0].ProvenanceKey].source_url;if(!valid.length){byId('empty').textContent='No unqualified numeric observations in this selection.';return}const name=`${byId('parameter').value} (${byId('units').value}) · ${selectionIdentity()} · Depth: ${byId('depth').value}`;const dataset=[{name,file:`Source ${payload.reports[rows[0].ProvenanceKey].request_id} · ${selectionIdentity()}`,rows:valid,rejected:0}];const frame=byId('chartframe'),root=frame.shadowRoot||frame.attachShadow({mode:'open'}),view=byId('view').value;let chartMarkup=rows[0].RetrievalGroup?payload.markup[view].replace('Qualified and invalid numeric results were excluded; source downloads retain them.','The Water Atlas graph API omits quality flags, so no qualifier filtering was possible.').replace('This chart contains one selected source/station, unit and depth group.','One station and parameter are selected. Sampling depths are unavailable and may be pooled.'):payload.markup[view];if(aggregateMode())chartMarkup=chartMarkup.replace('One station and parameter are selected. Sampling depths are unavailable and may be pooled.','Observations are pooled across the contributing source/station identities for one parameter and unit. Depths are unavailable. Stations sampled more frequently contribute more records; overlapping legacy and newer series may repeat observations.');if(rows.every(r=>r.DataSourceCode==='USGS_NWIS'))chartMarkup=chartMarkup.replace('Historical source-water observations, not a drinking-water safety assessment.','Historical USGS daily measurements.').replace('The Water Atlas graph API omits quality flags, so no qualifier filtering was possible.','USGS approval flags are retained; only approved values are charted.').replace('Qualified and invalid numeric results were excluded; source downloads retain them.','USGS qualified and invalid values are excluded; source downloads retain provider flags.');root.innerHTML=chartMarkup;const localDocument={getElementById:id=>root.getElementById(id),createElement:tag=>document.createElement(tag),createElementNS:(ns,tag)=>document.createElementNS(ns,tag)};try{renderers[view](localDocument,dataset);frame.hidden=false;}catch(error){root.replaceChildren();byId('empty').textContent='Could not draw this selection: '+error.message;}}
 
 function download(){const rows=selectedRows();if(!rows.length)return;const keys=Object.keys(rows[0]).filter(k=>!['date','numeric','CountyID','ProvenanceKey'].includes(k));const quote=v=>'"'+String(v??'').replaceAll('"','""')+'"';const csv=[keys.map(quote).join(','),...rows.map(r=>keys.map(k=>quote(r[k])).join(','))].join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='water-atlas-source-records.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 options('county',payload.counties.map(c=>c.id),'Choose a county');for(const option of byId('county').children){const county=payload.counties.find(c=>c.id===option.value);if(county)option.textContent=county.name;}chooseCounty();
@@ -677,6 +677,7 @@ function updateAnalysisScope(){
 }
 
 async function fetchWaterbodyStation(s,parameter,dates,body,isActive){
+ if(Number(parameter.Id)===-1)return fetchUSGSDailyStation(s,dates,body,isActive);
  const key=sourceStationKey(s),ids=s.measurement_inventory;
  if(ids?.status==='checked'&&!ids.ids.includes(Number(parameter.Id)))return {status:'not measured',rows:[],source_url:ids.source_url};
  const request=await atlasAPI('create',{stations:key,parameters:String(parameter.Id),...dates,siteId:s.sid,save:false,email:''});isActive();
@@ -705,7 +706,7 @@ function finishAggregation(state){
  byId('downloadaggregate').disabled=!state.rows.length;byId('downloadmanifest').disabled=!state.manifest.length;
  byId('measurement').hidden=!state.rows.length;
  options('parameter',unique(state.rows.map(r=>r.Characteristic)),'Choose a parameter');
- if(state.rows.some(r=>r.ParameterID===Number(state.parameter.Id))){byId('parameter').value=state.parameter.DisplayName;chooseParameter();}
+ if(state.rows.some(r=>r.ParameterID===Number(state.parameter.Id))){byId('parameter').value=state.rows.find(r=>r.ParameterID===Number(state.parameter.Id)).Characteristic;chooseParameter();}
  else clearChart();
 }
 async function loadWaterbodyObservations(){
@@ -728,7 +729,7 @@ async function loadWaterbodyObservations(){
 function stopAggregation(){aggregateBatchToken++;for(const id of ['aggregateparameter','aggregatefrom','aggregatethrough'])byId(id).disabled=false;if(!aggregateState)return;aggregateState.cancelled=true;aggregateGeneration++;finishAggregation(aggregateState);if(aggregateBatchProgress)byId('aggregatestatus').textContent=`Stopped after ${aggregateBatchProgress.done} / ${aggregateBatchProgress.total} measurement types completed. Unfinished types are not a complete waterbody download. `+byId('aggregatestatus').textContent;}
 async function loadWaterbodyChoice(){
  const token=++aggregateBatchToken;
- if(!selectedCounty()||!(waterbodyId(byId('waterbody').value)>0)||!byId('aggregatefrom').value||!byId('aggregatethrough').value||byId('aggregatefrom').value>byId('aggregatethrough').value){byId('aggregatestatus').textContent='Choose a named waterbody and valid date range.';return;}
+ if(!selectedCounty()||!validRetrievalScope()||!byId('aggregatefrom').value||!byId('aggregatethrough').value||byId('aggregatefrom').value>byId('aggregatethrough').value){byId('aggregatestatus').textContent='Choose a named waterbody and valid date range.';return;}
  if(byId('aggregateparameter').value!=='__ALL__'){aggregateBatchProgress=null;return loadWaterbodyObservations();}
  const ids=new Set(includedStations().flatMap(s=>s.measurement_inventory?.ids||[])),wanted=new Set(requestedMeasurements().flatMap(g=>g.ids));
  const params=parameterDefinitions.filter(p=>ids.has(Number(p.Id))&&(!wanted.size||wanted.has(Number(p.Id)))).sort((a,b)=>a.DisplayName.localeCompare(b.DisplayName));
@@ -754,6 +755,7 @@ clearChart=function(){clearBeforeDownloads();updateDownloadControls();updateGuid
 byId('downloadfiltered').addEventListener('click',()=>byId('chartframe').shadowRoot?.getElementById('download')?.click());
 const individualDraw=draw;
 draw=function(){individualDraw();updateDownloadControls();updateGuidedLayout();if(!aggregateMode()||byId('chartframe').hidden)return;const rows=selectedRows(),count=new Set(rows.map(stationKey)).size,root=byId('chartframe').shadowRoot;
+ if(rows.every(r=>r.DataSourceCode==='USGS_NWIS')){byId('quality').textContent=`${rows.length} USGS daily-statistic records. ${aggregateCompleteness()}. Approved values are charted; provider flags, units and statistics are retained in downloads.`;return;}
  byId('quality').textContent=`${rows.length} pooled observations. ${aggregateCompleteness()}. Sampling frequency affects each station's contribution. Graph data omit depths and quality flags.`;
  const source=root?.getElementById('source');if(source)source.textContent='Selected stations · '+aggregateCompleteness()+'. Individual station IDs, providers and retrieval URLs are retained in the source CSV and station manifest. Repeated records and overlapping legacy/newer provider series are retained.';
 };
@@ -774,6 +776,27 @@ byId('download').addEventListener('click',download);byId('atlasload').addEventLi
 byId('loadmeasurements').addEventListener('click',loadMeasurements);byId('refreshcatalog').addEventListener('click',refreshCatalog);
 byId('aggregateload').addEventListener('click',loadWaterbodyChoice);byId('stopaggregate').addEventListener('click',stopAggregation);byId('downloadaggregate').addEventListener('click',()=>downloadWaterbodyCSV());byId('downloadmanifest').addEventListener('click',()=>downloadWaterbodyCSV(true));
 findPlace();
+
+// USGS IDs can exist outside the Water Atlas surface-water catalog.
+parameterDefinitions.push({Id:-1,DisplayName:'USGS daily measurements (all available types)'});
+async function lookupUSGSStation(id,county){
+ const url='https://api.waterdata.usgs.gov/ogcapi/v1/collections/monitoring-locations/items/USGS-'+encodeURIComponent(id)+'?f=json';
+ const response=await fetch(url,{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('USGS lookup returned HTTP '+response.status);
+ const data=await response.json(),p=data.properties||{};
+ if(data.id!=='USGS-'+id||p.monitoring_location_number!==id||p.agency_code!=='USGS')throw Error('USGS station identity mismatch');
+ const countyName=String(p.county_name||'').replace(/ County$/i,'');
+ if(countyName.toLowerCase()!==county.gis_county.toLowerCase()||!county.name.endsWith(', '+p.state_name))throw Error('USGS assigns this station to '+p.county_name+', '+p.state_name+'; choose that county first');
+ const well=p.site_type_code==='GW',aquifer=p.national_aquifer_code==='N400BISCYN'?'Biscayne aquifer':p.national_aquifer_code||p.aquifer_code||'aquifer not supplied';
+ return {county_id:county.id,sid:county.atlas_site_id,atlas:'USGS station lookup',name:p.monitoring_location_name,ds:'USGS_NWIS',id,lat:data.geometry?.coordinates?.[1],lng:data.geometry?.coordinates?.[0],waterbody:well?'Groundwater — '+aquifer:'USGS location — surface-water association not verified',county:countyName,agency:'U.S. Geological Survey',status:'USGS identity and county verified',site_type:p.site_type,metadata_url:url,measurement_inventory:{status:'checked',ids:[-1],checked_at:new Date().toISOString(),source_url:url,availability_note:'Direct daily retrieval supported; parameter availability and period are confirmed when records are loaded'}};
+}
+async function fetchUSGSDailyStation(s,dates,body,isActive){
+ if(s.ds!=='USGS_NWIS')return {status:'not measured',rows:[]};
+ const url='https://waterservices.usgs.gov/nwis/dv/?format=json&sites='+encodeURIComponent(s.id)+'&startDT='+dates.startDate.slice(0,10)+'&endDT='+dates.endDate.slice(0,10)+'&siteStatus=all';
+ const response=await fetch(url,{signal:AbortSignal.timeout(30000)});isActive();if(!response.ok)throw Error('USGS daily data HTTP '+response.status);
+ const data=await response.json();isActive();
+ const rows=parseUSGS(data,s,stationIdPath()?catalogWaterbody(s):body,url,false).filter(r=>r.date>=dates.startDate.slice(0,10)&&r.date<=dates.endDate.slice(0,10)).map(r=>({...r,ParameterID:-1,USGSParameterCode:r.Characteristic.match(/\[(\d+);/)?.[1]||'',SourceWaterbodyName:catalogWaterbody(s),RequestID:'USGS daily-values API'}));
+ return {status:rows.length?'loaded':'no observations in period',rows,source_url:url};
+}
 
 // Reader-facing paths reuse the same station identity checks and retrieval pipeline.
 function stationIdPath(){return !!byId('pathstation').checked;}
@@ -806,12 +829,31 @@ byId('pathwaterbody').addEventListener('change',()=>selectStartingPath(false));
 byId('measurementspecific').addEventListener('change',()=>selectMeasurementChoice(true));
 byId('measurementall').addEventListener('change',()=>selectMeasurementChoice(false));
 const applyIDsBeforeGuidance=applyEnteredStationIDs;
-applyEnteredStationIDs=function(){
- if(stationIdPath()){
-  if(!selectedCounty()){byId('stationidresults').textContent='Choose a county first.';return;}
-  findPlace();
- }
- applyIDsBeforeGuidance();updateGuidedLayout();
+let stationLookupGeneration=0;
+applyEnteredStationIDs=async function(){
+ const county=selectedCounty();if(!county){byId('stationidresults').textContent='Choose a county first.';return;}
+ const generation=++stationLookupGeneration,tokens=parseStationIDs(byId('stationids').value),original=byId('stationids').value;
+ byId('applystationids').disabled=true;const messages=[];
+ try{
+  byId('stationidresults').textContent='Checking station IDs…';
+  const normalized=[];
+  for(const token of tokens){
+   const id=token.match(/^(?:USGS-|USGS_NWIS\|)?(\d{8,15})$/i)?.[1];
+   const knownUSGS=id&&catalogRows().find(s=>s.ds==='USGS_NWIS'&&String(s.id)===id);if(knownUSGS){knownUSGS.measurement_inventory={status:'checked',ids:[...new Set([...(knownUSGS.measurement_inventory?.ids||[]),-1])],source_url:'https://waterdata.usgs.gov/monitoring-location/USGS-'+id};}
+   if(!id||catalogRows().some(s=>String(s.id)===id&&(!token.startsWith('USGS')||s.ds==='USGS_NWIS'))){normalized.push(token.replace(/^USGS-/i,'USGS_NWIS|'));continue;}
+   try{
+    const s=await lookupUSGSStation(id,county);
+    if(generation!==stationLookupGeneration||selectedCounty()?.id!==county.id||byId('stationids').value!==original)return;
+    discovered=discovered.filter(x=>!(x.county_id===s.county_id&&sourceStationKey(x)===sourceStationKey(s)));discovered.push(s);normalized.push(sourceStationKey(s));
+   }catch(e){normalized.push(token);messages.push(token+': '+e.message);}
+  }
+  if(generation!==stationLookupGeneration||selectedCounty()?.id!==county.id||byId('stationids').value!==original)return;
+  byId('stationids').value=normalized.join('\n');
+  if(stationIdPath())findPlace();
+  applyIDsBeforeGuidance();
+  for(const message of messages){const p=document.createElement('p');p.textContent=message;byId('stationidresults').append(p);}
+  updateGuidedLayout();
+ }finally{if(generation===stationLookupGeneration)byId('applystationids').disabled=false;}
 };
 const chooseStationBeforeGuidance=chooseStation;
 chooseStation=function(){chooseStationBeforeGuidance();updateGuidedLayout();};
