@@ -7,6 +7,12 @@ retrieves and plots it. Change the dates and click Load available measurements
 to start a new date-range request. Chart views include seasonal boxes, annual
 boxes, and a year/month heatmap, with 0–6 display decimal places.
 
+## Map area search
+
+Choose **Explore stations on a map** to search across all catalog counties. Draw a polygon, rectangle, circle or freehand outline; an exact-coordinate rectangle is also available. Station inclusion uses the actual boundary, rather than the shape's bounding box. Select measurements in Step 2 to distinguish available, not listed and unverified inventories, then select stations and load observations in Step 3. Date-range coverage is checked separately. Inventory availability does not guarantee observations in a requested period.
+
+A compact index includes all catalog locations with valid coordinates. Only counties intersecting an area are loaded. A failed county download is reported as a partial result. The map overview can thin displayed markers for responsiveness; search counts, filtering and retrieval do not discard those records. Station county, provider, waterbody and source identity are retained in downloaded records. Map tiles use CARTO/OpenStreetMap attribution; Leaflet is bundled under its included license. No paid map API or Python installation is required for visitors.
+
 ## Discovery
 
 The authoritative Water Atlas sampling-location GIS layer provides county,
