@@ -958,7 +958,7 @@ async function initializeStationMap(){
   if(typeof L==='undefined')throw Error('Map library has not loaded. Reload this page or use the coordinate rectangle.');
   if(!mapObject){
    mapObject=L.map('stationmap',{preferCanvas:true,scrollWheelZoom:false}).setView([28,-82],6);mapCanvas=L.canvas({padding:.25});
-   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'}).addTo(mapObject);
+   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(mapObject);
    mapMarkers=L.layerGroup().addTo(mapObject);mapObject.on('moveend',()=>{if(!mapDrawing)renderMapMarkers();});
    mapObject.on('click',e=>{
     if(!mapDrawing||byId('mapshape').value==='freehand')return;mapDraft.push([e.latlng.lat,e.latlng.lng]);draftMapArea();const kind=byId('mapshape').value;
