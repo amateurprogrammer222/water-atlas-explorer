@@ -163,7 +163,7 @@ function download(){const rows=selectedRows();if(!rows.length)return;const keys=
 options('county',payload.counties.map(c=>c.id),'Choose a county');for(const option of byId('county').children){const county=payload.counties.find(c=>c.id===option.value);if(county)option.textContent=county.name;}chooseCounty();
 
 // Measurement availability is based on each station's authoritative ParameterList.
-const parameterDefinitions=payload.parameter_definitions||[];
+const parameterDefinitions=[...(payload.parameter_definitions||[]),{Id:-1,DisplayName:'USGS daily measurements (all available types)'}];
 const phosphorusIds=parameterDefinitions.filter(p=>/phosphorus|phosphate/i.test(p.DisplayName)).map(p=>Number(p.Id));
 const measurementGroups=[
  {key:'tn',label:'Total nitrogen (TN)',ids:[915]},
@@ -780,7 +780,6 @@ byId('aggregateload').addEventListener('click',loadWaterbodyChoice);byId('stopag
 findPlace();
 
 // USGS IDs can exist outside the Water Atlas surface-water catalog.
-parameterDefinitions.push({Id:-1,DisplayName:'USGS daily measurements (all available types)'});
 async function lookupUSGSStation(id,county){
  const url='https://api.waterdata.usgs.gov/ogcapi/v1/collections/monitoring-locations/items/USGS-'+encodeURIComponent(id)+'?f=json';
  const response=await fetch(url,{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('USGS lookup returned HTTP '+response.status);
